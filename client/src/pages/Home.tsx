@@ -1,25 +1,29 @@
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { Streamdown } from 'streamdown';
-
 /**
- * All content in this page are only for example, replace with your own feature implementation
- * When building pages, remember your instructions in Frontend Best Practices, Design Guide and Common Pitfalls
+ * 湘超地图互动页面 - 「湖湘风物志」新中式地图志美学
+ * 
+ * Design: Neo-Chinese Cartographic style
+ * Colors: Rice paper #F5EDE0, Ink #2C2C2C, Cinnabar #C84B31, Indigo #2B4C7E
+ * Typography: Ma Shan Zheng (display), Noto Serif SC (headings), Noto Sans SC (body)
  */
-export default function Home() {
-  // If theme is switchable in App.tsx, we can implement theme toggling like this:
-  // const { theme, toggleTheme } = useTheme();
 
+import Navbar from "@/components/Navbar";
+import HeroSection from "@/components/HeroSection";
+import FeatureNav from "@/components/FeatureNav";
+import StatsBar from "@/components/StatsBar";
+import TeamShowcase from "@/components/TeamShowcase";
+import ScheduleTimeline from "@/components/ScheduleTimeline";
+import Footer from "@/components/Footer";
+
+export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <main>
-        {/* Example: lucide-react for icons */}
-        <Loader2 className="animate-spin" />
-        Example Page
-        {/* Example: Streamdown for markdown rendering */}
-        <Streamdown>Any **markdown** content</Streamdown>
-        <Button variant="default">Example Button</Button>
-      </main>
+    <div className="min-h-screen rice-paper-bg">
+      <Navbar />
+      <HeroSection />
+      <StatsBar />
+      <FeatureNav />
+      <TeamShowcase />
+      <ScheduleTimeline />
+      <Footer />
     </div>
   );
 }
