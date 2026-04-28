@@ -1,11 +1,13 @@
 /**
  * Navbar - 顶部导航栏
  * 新中式卷轴题签风格，米白底色+墨色文字+朱砂红强调
+ * 支持开灯/关灯模式切换
  */
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { MapPin, Calendar, Utensils, Menu, X } from "lucide-react";
+import { MapPin, Calendar, Utensils, Menu, X, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const navItems = [
   { label: "全部", href: "#all", active: true },
@@ -26,6 +28,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { scrollYProgress } = useScroll();
   const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+  const { theme, toggleTheme, isLightMode } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -33,16 +36,17 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Dynamic colors based on theme
+  const navBg = isLightMode
+    ? scrolled ? "bg-white/95 backdrop-blur-md shadow-[0_1px_0_rgba(200,75,49,0.08)]" : "bg-white/80 backdrop-blur-sm"
+    : scrolled ? "bg-[#F5EDE0]/95 backdrop-blur-md shadow-[0_1px_0_rgba(200,75,49,0.12)]" : "bg-[#F5EDE0]/80 backdrop-blur-sm";
+
   return (
     <motion.nav
       initial={{ y: -80 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "bg-[#F5EDE0]/95 backdrop-blur-md shadow-[0_1px_0_rgba(200,75,49,0.12)]"
-          : "bg-[#F5EDE0]/80 backdrop-blur-sm"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${navBg}`}
     >
       {/* Scroll progress bar */}
       <motion.div
@@ -92,7 +96,7 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Quick Links */}
+          {/* Quick Links + Theme Toggle */}
           <div className="hidden md:flex items-center gap-5">
             {quickLinks.map((link) => (
               <a
@@ -105,15 +109,56 @@ export default function Navbar() {
                 <span>{link.label}</span>
               </a>
             ))}
+
+            {/* Theme Toggle Button */}
+            {toggleTheme && (
+              <button
+                onClick={toggleTheme}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-500 border group"
+                style={{
+                  backgroundColor: isLightMode ? '#FFF8F0' : '#2C2C2C',
+                  borderColor: isLightMode ? 'rgba(200,168,130,0.3)' : 'rgba(200,75,49,0.3)',
+                  color: isLightMode ? '#C84B31' : '#F5EDE0',
+                }}
+                title={isLightMode ? "关灯（暗色模式）" : "开灯（亮色模式）"}
+              >
+                <motion.div
+                  key={theme}
+                  initial={{ rotate: -90, scale: 0.5, opacity: 0 }}
+                  animate={{ rotate: 0, scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  {isLightMode ? <Sun size={14} strokeWidth={1.8} /> : <Moon size={14} strokeWidth={1.8} />}
+                </motion.div>
+                <span className="text-[11px] tracking-wider" style={{ fontFamily: "'Noto Sans SC', sans-serif", fontWeight: 400 }}>
+                  {isLightMode ? "开灯" : "关灯"}
+                </span>
+              </button>
+            )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 text-[#2C2C2C]/70 hover:text-[#2C2C2C] transition-colors"
-          >
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+          {/* Mobile: Theme Toggle + Menu Button */}
+          <div className="md:hidden flex items-center gap-2">
+            {toggleTheme && (
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-full transition-all duration-300"
+                style={{
+                  backgroundColor: isLightMode ? '#FFF8F0' : '#2C2C2C',
+                  color: isLightMode ? '#C84B31' : '#F5EDE0',
+                }}
+                title={isLightMode ? "关灯" : "开灯"}
+              >
+                {isLightMode ? <Sun size={18} strokeWidth={1.8} /> : <Moon size={18} strokeWidth={1.8} />}
+              </button>
+            )}
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="p-2 text-[#2C2C2C]/70 hover:text-[#2C2C2C] transition-colors"
+            >
+              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -125,7 +170,9 @@ export default function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="md:hidden bg-[#F5EDE0]/98 backdrop-blur-md border-t border-[#C8A882]/15 overflow-hidden"
+            className={`md:hidden backdrop-blur-md border-t border-[#C8A882]/15 overflow-hidden ${
+              isLightMode ? "bg-white/98" : "bg-[#F5EDE0]/98"
+            }`}
           >
             <div className="container py-4 space-y-1">
               {navItems.map((item, i) => (

@@ -6,6 +6,7 @@ interface ThemeContextType {
   theme: Theme;
   toggleTheme?: () => void;
   switchable: boolean;
+  isLightMode: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -33,8 +34,10 @@ export function ThemeProvider({
     const root = document.documentElement;
     if (theme === "dark") {
       root.classList.add("dark");
+      root.classList.remove("light-mode");
     } else {
       root.classList.remove("dark");
+      root.classList.add("light-mode");
     }
 
     if (switchable) {
@@ -49,7 +52,7 @@ export function ThemeProvider({
     : undefined;
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, switchable }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, switchable, isLightMode: theme === "light" }}>
       {children}
     </ThemeContext.Provider>
   );

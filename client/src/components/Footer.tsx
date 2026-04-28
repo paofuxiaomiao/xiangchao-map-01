@@ -1,13 +1,19 @@
 /**
  * Footer - 页面底部
  * 新中式风格，简洁的底部信息
+ * 支持开灯/关灯模式
  */
 
 import { motion } from "framer-motion";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function Footer() {
+  const { isLightMode } = useTheme();
+
   return (
-    <footer className="border-t border-[#C8A882]/20 mt-4">
+    <footer className={`border-t mt-4 transition-colors duration-700 ${
+      isLightMode ? "border-gray-200/60" : "border-[#C8A882]/20"
+    }`}>
       <div className="container py-10 md:py-12">
         <motion.div
           initial={{ opacity: 0 }}
@@ -39,14 +45,14 @@ export default function Footer() {
 
             {/* Center - Decorative */}
             <div className="hidden md:flex items-center gap-4">
-              <div className="h-px w-10 bg-[#C8A882]/25" />
+              <div className={`h-px w-10 ${isLightMode ? "bg-gray-300/30" : "bg-[#C8A882]/25"}`} />
               <span
                 className="text-[10px] text-[#A0522D]/30 tracking-[0.2em]"
                 style={{ fontFamily: "'Playfair Display', serif", fontStyle: "italic" }}
               >
                 Hunan Football League
               </span>
-              <div className="h-px w-10 bg-[#C8A882]/25" />
+              <div className={`h-px w-10 ${isLightMode ? "bg-gray-300/30" : "bg-[#C8A882]/25"}`} />
             </div>
 
             {/* Right - Links */}
@@ -66,7 +72,9 @@ export default function Footer() {
           </div>
 
           {/* Bottom bar */}
-          <div className="mt-8 pt-5 border-t border-[#C8A882]/10 text-center">
+          <div className={`mt-8 pt-5 border-t text-center transition-colors duration-700 ${
+            isLightMode ? "border-gray-200/40" : "border-[#C8A882]/10"
+          }`}>
             <p className="text-[10px] text-[#2C2C2C]/20" style={{ fontFamily: "'Noto Sans SC', sans-serif", fontWeight: 300 }}>
               2025 湖南省足球联赛 · 湘超联赛互动地图
             </p>

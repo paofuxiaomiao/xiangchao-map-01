@@ -1,22 +1,29 @@
 /**
  * HeroSection - 页面顶部英雄区域
  * 展示湘超联赛主视觉，带有卷轴展开动画效果
+ * 支持开灯/关灯模式：开灯时减轻暗色遮罩
  */
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const HERO_MAP_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663342549613/PTTLTxHAi2ew5ErQAK9Ahy/hero_map-B8xceQvduLTu5V6oQPRsAg.webp";
 
 export default function HeroSection() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const { isLightMode } = useTheme();
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
   });
 
   const imageY = useTransform(scrollYProgress, [0, 1], [0, 80]);
-  const overlayOpacity = useTransform(scrollYProgress, [0, 0.5], [0.6, 0.8]);
+  const overlayOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.5],
+    isLightMode ? [0.15, 0.3] : [0.6, 0.8]
+  );
 
   return (
     <section ref={sectionRef} className="relative pt-16 md:pt-18">
@@ -60,28 +67,48 @@ export default function HeroSection() {
           className="relative group"
         >
           {/* Decorative frame corners */}
-          <div className="absolute -top-2 -left-2 w-8 h-8 border-t-2 border-l-2 border-[#C84B31]/25 z-10 transition-all duration-500 group-hover:border-[#C84B31]/50 group-hover:w-10 group-hover:h-10" />
-          <div className="absolute -top-2 -right-2 w-8 h-8 border-t-2 border-r-2 border-[#C84B31]/25 z-10 transition-all duration-500 group-hover:border-[#C84B31]/50 group-hover:w-10 group-hover:h-10" />
-          <div className="absolute -bottom-2 -left-2 w-8 h-8 border-b-2 border-l-2 border-[#C84B31]/25 z-10 transition-all duration-500 group-hover:border-[#C84B31]/50 group-hover:w-10 group-hover:h-10" />
-          <div className="absolute -bottom-2 -right-2 w-8 h-8 border-b-2 border-r-2 border-[#C84B31]/25 z-10 transition-all duration-500 group-hover:border-[#C84B31]/50 group-hover:w-10 group-hover:h-10" />
+          <div className={`absolute -top-2 -left-2 w-8 h-8 border-t-2 border-l-2 z-10 transition-all duration-500 group-hover:w-10 group-hover:h-10 ${
+            isLightMode ? "border-[#C84B31]/40 group-hover:border-[#C84B31]/70" : "border-[#C84B31]/25 group-hover:border-[#C84B31]/50"
+          }`} />
+          <div className={`absolute -top-2 -right-2 w-8 h-8 border-t-2 border-r-2 z-10 transition-all duration-500 group-hover:w-10 group-hover:h-10 ${
+            isLightMode ? "border-[#C84B31]/40 group-hover:border-[#C84B31]/70" : "border-[#C84B31]/25 group-hover:border-[#C84B31]/50"
+          }`} />
+          <div className={`absolute -bottom-2 -left-2 w-8 h-8 border-b-2 border-l-2 z-10 transition-all duration-500 group-hover:w-10 group-hover:h-10 ${
+            isLightMode ? "border-[#C84B31]/40 group-hover:border-[#C84B31]/70" : "border-[#C84B31]/25 group-hover:border-[#C84B31]/50"
+          }`} />
+          <div className={`absolute -bottom-2 -right-2 w-8 h-8 border-b-2 border-r-2 z-10 transition-all duration-500 group-hover:w-10 group-hover:h-10 ${
+            isLightMode ? "border-[#C84B31]/40 group-hover:border-[#C84B31]/70" : "border-[#C84B31]/25 group-hover:border-[#C84B31]/50"
+          }`} />
 
           {/* Map Image Container */}
-          <div className="relative overflow-hidden rounded-sm">
+          <div className={`relative overflow-hidden rounded-sm transition-shadow duration-700 ${
+            isLightMode ? "shadow-lg shadow-[#C8A882]/20" : ""
+          }`}>
             <motion.img
               src={HERO_MAP_URL}
               alt="湘超联赛地图 - 湖南十四城球队分布"
-              className="w-full h-[260px] sm:h-[360px] md:h-[460px] lg:h-[520px] object-cover"
+              className={`w-full h-[260px] sm:h-[360px] md:h-[460px] lg:h-[520px] object-cover transition-all duration-700 ${
+                isLightMode ? "brightness-110 contrast-105" : ""
+              }`}
               style={{ y: imageY }}
             />
 
-            {/* Overlay gradient */}
+            {/* Overlay gradient - much lighter in light mode */}
             <motion.div
-              className="absolute inset-0 bg-gradient-to-t from-[#2C2C2C] via-transparent to-transparent"
+              className={`absolute inset-0 transition-all duration-700 ${
+                isLightMode
+                  ? "bg-gradient-to-t from-[#F5EDE0]/60 via-transparent to-[#F5EDE0]/10"
+                  : "bg-gradient-to-t from-[#2C2C2C] via-transparent to-transparent"
+              }`}
               style={{ opacity: overlayOpacity }}
             />
 
-            {/* Vignette effect */}
-            <div className="absolute inset-0 shadow-[inset_0_0_100px_rgba(44,44,44,0.15)]" />
+            {/* Vignette effect - lighter in light mode */}
+            <div className={`absolute inset-0 transition-all duration-700 ${
+              isLightMode
+                ? "shadow-[inset_0_0_100px_rgba(245,237,224,0.2)]"
+                : "shadow-[inset_0_0_100px_rgba(44,44,44,0.15)]"
+            }`} />
 
             {/* Map info overlay */}
             <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 lg:p-8">
@@ -94,17 +121,29 @@ export default function HeroSection() {
                         <circle cx="12" cy="10" r="3" />
                       </svg>
                     </div>
-                    <span className="text-[#F5EDE0]/50 text-[10px] md:text-xs tracking-wider uppercase" style={{ fontFamily: "'Playfair Display', serif" }}>
+                    <span
+                      className={`text-[10px] md:text-xs tracking-wider uppercase transition-colors duration-700 ${
+                        isLightMode ? "text-[#2C2C2C]/50" : "text-[#F5EDE0]/50"
+                      }`}
+                      style={{ fontFamily: "'Playfair Display', serif" }}
+                    >
                       Hunan Province
                     </span>
                   </div>
                   <h2
-                    className="text-lg md:text-xl lg:text-2xl text-[#F5EDE0] font-semibold"
+                    className={`text-lg md:text-xl lg:text-2xl font-semibold transition-colors duration-700 ${
+                      isLightMode ? "text-[#2C2C2C]" : "text-[#F5EDE0]"
+                    }`}
                     style={{ fontFamily: "'Noto Serif SC', serif" }}
                   >
                     湘超赛事一览
                   </h2>
-                  <p className="text-[#F5EDE0]/60 text-xs md:text-sm mt-1" style={{ fontFamily: "'Noto Sans SC', sans-serif", fontWeight: 300 }}>
+                  <p
+                    className={`text-xs md:text-sm mt-1 transition-colors duration-700 ${
+                      isLightMode ? "text-[#2C2C2C]/60" : "text-[#F5EDE0]/60"
+                    }`}
+                    style={{ fontFamily: "'Noto Sans SC', sans-serif", fontWeight: 300 }}
+                  >
                     14支城市代表队 · 98场精彩对决 · 三色图层
                   </p>
                 </div>

@@ -1,9 +1,11 @@
 /**
  * ScheduleTimeline - 赛程时间轴
  * 展示湘超联赛关键赛事节点，水墨风格时间轴
+ * 支持开灯/关灯模式
  */
 
 import { motion } from "framer-motion";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface TimelineItem {
   date: string;
@@ -22,8 +24,12 @@ const timeline: TimelineItem[] = [
 ];
 
 export default function ScheduleTimeline() {
+  const { isLightMode } = useTheme();
+
   return (
-    <section className="py-12 md:py-16 border-t border-[#C8A882]/15" id="schedule">
+    <section className={`py-12 md:py-16 border-t transition-colors duration-700 ${
+      isLightMode ? "border-gray-200/60" : "border-[#C8A882]/15"
+    }`} id="schedule">
       <div className="container">
         {/* Section Header */}
         <motion.div
@@ -53,16 +59,20 @@ export default function ScheduleTimeline() {
           </p>
           {/* Decorative line */}
           <div className="flex items-center justify-center gap-3 mt-5">
-            <div className="h-px w-8 bg-[#C8A882]/30" />
+            <div className={`h-px w-8 ${isLightMode ? "bg-gray-300/40" : "bg-[#C8A882]/30"}`} />
             <div className="w-1.5 h-1.5 rounded-full bg-[#C84B31]/40" />
-            <div className="h-px w-8 bg-[#C8A882]/30" />
+            <div className={`h-px w-8 ${isLightMode ? "bg-gray-300/40" : "bg-[#C8A882]/30"}`} />
           </div>
         </motion.div>
 
         {/* Timeline - Desktop: alternating, Mobile: left-aligned */}
         <div className="relative max-w-3xl mx-auto">
           {/* Center line */}
-          <div className="absolute left-[18px] md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-[#C8A882]/10 via-[#C8A882]/25 to-[#C8A882]/10 md:-translate-x-px" />
+          <div className={`absolute left-[18px] md:left-1/2 top-0 bottom-0 w-px md:-translate-x-px ${
+            isLightMode
+              ? "bg-gradient-to-b from-gray-200/20 via-gray-300/40 to-gray-200/20"
+              : "bg-gradient-to-b from-[#C8A882]/10 via-[#C8A882]/25 to-[#C8A882]/10"
+          }`} />
 
           {timeline.map((item, i) => {
             const isLeft = i % 2 === 0;
@@ -85,6 +95,8 @@ export default function ScheduleTimeline() {
                     className={`w-3 h-3 rounded-full border-2 transition-all duration-300 ${
                       item.highlight
                         ? "bg-[#C84B31] border-[#C84B31] shadow-[0_0_8px_rgba(200,75,49,0.3)]"
+                        : isLightMode
+                        ? "bg-white border-gray-300/60 hover:border-[#C84B31]/60"
                         : "bg-[#F5EDE0] border-[#C8A882]/40 hover:border-[#C84B31]/60"
                     }`}
                   />

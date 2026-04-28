@@ -1,11 +1,13 @@
 /**
  * TeamShowcase - 球队展示区域
  * 展示14支城市代表队的信息卡片，横向滚动
+ * 支持开灯/关灯模式
  */
 
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface Team {
   name: string;
@@ -38,6 +40,7 @@ export default function TeamShowcase() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const { isLightMode } = useTheme();
 
   const checkScroll = () => {
     if (!scrollRef.current) return;
@@ -52,6 +55,8 @@ export default function TeamShowcase() {
     scrollRef.current.scrollBy({ left: amount, behavior: "smooth" });
     setTimeout(checkScroll, 400);
   };
+
+  const fadeBg = isLightMode ? "#FFFFFF" : "#F5EDE0";
 
   return (
     <section className="py-12 md:py-16" id="teams">
@@ -108,9 +113,20 @@ export default function TeamShowcase() {
 
         {/* Scrollable Team Cards */}
         <div className="relative">
-          {/* Fade edges */}
-          <div className="absolute left-0 top-0 bottom-4 w-8 bg-gradient-to-r from-[#F5EDE0] to-transparent z-10 pointer-events-none opacity-0 transition-opacity duration-300" style={{ opacity: canScrollLeft ? 1 : 0 }} />
-          <div className="absolute right-0 top-0 bottom-4 w-8 bg-gradient-to-l from-[#F5EDE0] to-transparent z-10 pointer-events-none" />
+          {/* Fade edges - adapt to theme */}
+          <div
+            className="absolute left-0 top-0 bottom-4 w-8 z-10 pointer-events-none transition-opacity duration-300"
+            style={{
+              opacity: canScrollLeft ? 1 : 0,
+              background: `linear-gradient(to right, ${fadeBg}, transparent)`,
+            }}
+          />
+          <div
+            className="absolute right-0 top-0 bottom-4 w-8 z-10 pointer-events-none"
+            style={{
+              background: `linear-gradient(to left, ${fadeBg}, transparent)`,
+            }}
+          />
 
           <div
             ref={scrollRef}
@@ -127,7 +143,11 @@ export default function TeamShowcase() {
                 transition={{ duration: 0.4, delay: Math.min(i * 0.04, 0.3) }}
                 className="flex-shrink-0 w-[170px] md:w-[200px] group cursor-pointer"
               >
-                <div className="bg-[#F5EDE0] border border-[#C8A882]/15 rounded-sm p-4 md:p-5 h-full transition-all duration-500 group-hover:border-[#C84B31]/25 group-hover:shadow-[0_6px_24px_rgba(200,75,49,0.06)] relative overflow-hidden">
+                <div className={`border rounded-sm p-4 md:p-5 h-full transition-all duration-500 relative overflow-hidden ${
+                  isLightMode
+                    ? "bg-white border-gray-200/60 group-hover:border-[#C84B31]/30 group-hover:shadow-[0_8px_30px_rgba(200,75,49,0.08)]"
+                    : "bg-[#F5EDE0] border-[#C8A882]/15 group-hover:border-[#C84B31]/25 group-hover:shadow-[0_6px_24px_rgba(200,75,49,0.06)]"
+                }`}>
                   {/* Subtle top accent line */}
                   <div
                     className="absolute top-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
@@ -161,7 +181,9 @@ export default function TeamShowcase() {
                   </p>
 
                   {/* Points */}
-                  <div className="flex items-baseline gap-1 pt-3 border-t border-[#C8A882]/12">
+                  <div className={`flex items-baseline gap-1 pt-3 border-t ${
+                    isLightMode ? "border-gray-200/50" : "border-[#C8A882]/12"
+                  }`}>
                     <span
                       className="text-xl md:text-2xl text-[#2C2C2C]"
                       style={{ fontFamily: "'Noto Serif SC', serif", fontWeight: 700 }}

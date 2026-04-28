@@ -2,11 +2,13 @@
  * FeatureNav - 功能导航区域
  * 参考农耕地图的1大+2中+2小卡片布局
  * 每个卡片对应一个功能板块，带有悬停展开效果
+ * 支持开灯/关灯模式
  */
 
 import { motion } from "framer-motion";
 import { MapPin, Route, Trophy, Calendar, Utensils } from "lucide-react";
 import { toast } from "sonner";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const MATCH_ROUTE_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663342549613/PTTLTxHAi2ew5ErQAK9Ahy/match_route-jERHZTUWYEULUCUozqJic2.webp";
 const TEAM_GLORY_URL = "https://d2xsxph8kpxj0f.cloudfront.net/310519663342549613/PTTLTxHAi2ew5ErQAK9Ahy/team_glory-gnW3qkJkEBprMftVXxw3fR.webp";
@@ -22,9 +24,10 @@ interface FeatureCardProps {
   delay?: number;
   size?: "large" | "medium" | "small";
   tag?: string;
+  isLightMode: boolean;
 }
 
-function FeatureCard({ title, subtitle, imageUrl, icon: Icon, className = "", delay = 0, size = "medium", tag }: FeatureCardProps) {
+function FeatureCard({ title, subtitle, imageUrl, icon: Icon, className = "", delay = 0, size = "medium", tag, isLightMode }: FeatureCardProps) {
   const heightClass = size === "large" 
     ? "h-[280px] sm:h-[340px] md:h-[400px]" 
     : size === "medium" 
@@ -38,19 +41,27 @@ function FeatureCard({ title, subtitle, imageUrl, icon: Icon, className = "", de
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -4 }}
-      className={`group relative overflow-hidden rounded-sm cursor-pointer ${heightClass} ${className}`}
+      className={`group relative overflow-hidden rounded-sm cursor-pointer ${heightClass} ${className} ${
+        isLightMode ? "shadow-md shadow-gray-200/50" : ""
+      }`}
       onClick={() => toast("功能即将上线", { description: `${title}模块正在开发中` })}
     >
       {/* Background Image */}
       <img
         src={imageUrl}
         alt={title}
-        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+        className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-105 ${
+          isLightMode ? "brightness-110" : ""
+        }`}
         loading="lazy"
       />
 
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/75 via-[#1a1a1a]/25 to-[#1a1a1a]/5 transition-all duration-500 group-hover:from-[#1a1a1a]/85" />
+      {/* Gradient Overlay - lighter in light mode */}
+      <div className={`absolute inset-0 transition-all duration-500 ${
+        isLightMode
+          ? "bg-gradient-to-t from-[#2C2C2C]/50 via-[#2C2C2C]/10 to-transparent group-hover:from-[#2C2C2C]/65"
+          : "bg-gradient-to-t from-[#1a1a1a]/75 via-[#1a1a1a]/25 to-[#1a1a1a]/5 group-hover:from-[#1a1a1a]/85"
+      }`} />
 
       {/* Top tag */}
       {tag && (
@@ -68,7 +79,11 @@ function FeatureCard({ title, subtitle, imageUrl, icon: Icon, className = "", de
       {/* Content */}
       <div className="absolute bottom-0 left-0 right-0 p-5 md:p-6">
         {/* Icon */}
-        <div className="w-10 h-10 rounded-full bg-[#F5EDE0]/10 backdrop-blur-sm flex items-center justify-center mb-3 border border-[#F5EDE0]/15 group-hover:bg-[#C84B31]/80 group-hover:border-[#C84B31]/50 transition-all duration-500">
+        <div className={`w-10 h-10 rounded-full backdrop-blur-sm flex items-center justify-center mb-3 border transition-all duration-500 ${
+          isLightMode
+            ? "bg-white/20 border-white/25 group-hover:bg-[#C84B31]/80 group-hover:border-[#C84B31]/50"
+            : "bg-[#F5EDE0]/10 border-[#F5EDE0]/15 group-hover:bg-[#C84B31]/80 group-hover:border-[#C84B31]/50"
+        }`}>
           <Icon size={18} className="text-[#F5EDE0]" strokeWidth={1.5} />
         </div>
 
@@ -104,6 +119,8 @@ function FeatureCard({ title, subtitle, imageUrl, icon: Icon, className = "", de
 }
 
 export default function FeatureNav() {
+  const { isLightMode } = useTheme();
+
   return (
     <section className="pb-16 md:pb-20" id="features">
       <div className="container">
@@ -135,9 +152,9 @@ export default function FeatureNav() {
           </p>
           {/* Decorative line */}
           <div className="flex items-center justify-center gap-3 mt-5">
-            <div className="h-px w-8 bg-[#C8A882]/30" />
+            <div className={`h-px w-8 ${isLightMode ? "bg-gray-300/40" : "bg-[#C8A882]/30"}`} />
             <div className="w-1.5 h-1.5 rounded-full bg-[#C84B31]/40" />
-            <div className="h-px w-8 bg-[#C8A882]/30" />
+            <div className={`h-px w-8 ${isLightMode ? "bg-gray-300/40" : "bg-[#C8A882]/30"}`} />
           </div>
         </motion.div>
 
@@ -152,6 +169,7 @@ export default function FeatureNav() {
             size="large"
             delay={0.1}
             tag="热门"
+            isLightMode={isLightMode}
           />
 
           {/* Row 2: Two medium cards */}
@@ -163,6 +181,7 @@ export default function FeatureNav() {
               icon={Trophy}
               size="medium"
               delay={0.2}
+              isLightMode={isLightMode}
             />
             <FeatureCard
               title="赛事日历"
@@ -172,6 +191,7 @@ export default function FeatureNav() {
               size="medium"
               delay={0.3}
               tag="赛程"
+              isLightMode={isLightMode}
             />
           </div>
 
@@ -184,6 +204,7 @@ export default function FeatureNav() {
               icon={Utensils}
               size="small"
               delay={0.4}
+              isLightMode={isLightMode}
             />
             <FeatureCard
               title="积分排行"
@@ -193,6 +214,7 @@ export default function FeatureNav() {
               size="small"
               delay={0.5}
               tag="数据"
+              isLightMode={isLightMode}
             />
           </div>
         </div>
